@@ -1,0 +1,44 @@
+﻿@model OnlineCourses.Models.ViewModels.Account.LoginViewModel
+@{
+	ViewData["Title"] = "Авторизация";
+}
+@await Html.PartialAsync("HeaderPartial")
+
+<section class="gradient-custom">
+	<div class="container py-5 h-100">
+		<div class="row d-flex justify-content-center align-items-center">
+			<div class="col-12 col-md-8 col-lg-6 col-xl-5">
+
+
+				<form autocomplete="on" method="post" asp-area="" asp-controller="Account" asp-action="Login">
+					<div class="d-flex flex-column align-items-center justify-content-between">
+						<h2>Вход</h2>
+
+						<div class="col-md-7 mb-3">
+							<label asp-for="Login"></label>
+							<input asp-for="Login" class="form-control" placeholder="Введите логин">
+							<span asp-validation-for="Login" class="text-danger"></span>
+						</div>
+
+						<div class="col-md-7 mb-3">
+							<label asp-for="Email"></label>
+							<input asp-for="Email" class="form-control" placeholder="Введите почту">
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+
+						<div class="col-md-7 mb-3">
+							<label asp-for="Password"></label>
+							<input asp-for="Password" class="form-control" placeholder="Введите пароль">
+							<span asp-validation-for="Password" class="text-danger"></span>
+						</div>
+
+						<input type="submit" class="btn btn-primary fw-bold border-2 px-5" value="Войти">
+					</div>
+				</form>
+
+
+				<a class="text-center" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
+			</div>
+		</div>
+	</div>
+</section>

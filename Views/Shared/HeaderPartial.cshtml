@@ -1,0 +1,51 @@
+﻿
+<header class="position-sticky top-0  z-3">
+	<nav class="navbar navbar-expand-sm navbar-dark navbar-toggleable-sm navbar-light bg-dark mb-3">
+		<div class="container-fluid">
+			<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+				<img src="~/image/Logo.svg" alt="" style="max-height:30px;" />
+			</a>
+
+			<div>
+				<button class="btn btn-outline-light offbtn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+					Меню
+				</button>
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+
+			<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="topNavBar">
+				<div class="ms-lg-0">
+					<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand me-3 fw-bold fs-6">Каталог</a>
+					<a asp-area="" asp-controller="Learning" asp-action="" class="navbar-brand me-3 fw-bold fs-6">Мое обучение</a>
+					<a asp-area="" asp-controller="Create" asp-action="Index" class="navbar-brand me-3 fw-bold fs-6">Преподавателям</a>
+				</div>
+
+				<ul class="navbar-nav">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle ms-2" href="#" role="button" data-bs-toggle="dropdown"
+						   aria-expanded="false">
+							<i class="fa-solid fa-user fa-fw"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							@if (!User.Identity.IsAuthenticated)
+							{
+								<li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Login">Вход</a></li>
+								<li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a></li>
+							}
+							else
+							{
+								<li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Profile">Профиль</a></li>
+								<form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+									<input class="dropdown-item" type="submit" value="Выйти" />
+								</form>
+							}
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</header>

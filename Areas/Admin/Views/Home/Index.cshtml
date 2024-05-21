@@ -1,0 +1,130 @@
+﻿@model List<User>;
+
+@await Html.PartialAsync("HeaderPartial")
+
+@{
+	ViewData["Title"] = "Пользователи";
+}
+
+<link href="~/lib/DataTables/datatables.min.css" rel="stylesheet">
+
+
+<!-- Основной блок -->
+<main>
+	<div class="col-md-10 mx-auto mb-5">
+		<!-- Форма создания -->
+
+		<div class="w-100 hstack gap-3">
+			<h3>Список пользователей</h3>
+		</div>
+
+		<table id="UserTable" class="display userForms">
+			<thead>
+				<tr>
+					<th>Фото</th>
+					<th>Имя</th>
+					<th>Логин</th>
+					<th>Почта</th>
+					<th>Дата создания</th>
+					<th>Статус</th>
+					<th>Курсы пользователя</th>
+				</tr>
+			</thead>
+			<tbody>
+				@{
+					var Status = Enum.GetValues(typeof(SubStatus)).Cast<SubStatus>();
+				}
+				@foreach (var user in Model)
+				{
+					<tr>
+						<td><img src="~/image/avatars/@user.AvatarPath" id="userImage" alt="Avatar" style="width: 20px; height: 20px;" /></td>
+						<td>@user.UserName</td>
+						<td>@user.Login</td>
+						<td>@user.Email</td>
+						<td>@user.DateCreate.ToString("dd MMMM yyyy")</td>
+						<td>
+							<form asp-area="Admin" asp-controller="Home" asp-action="SwapStatusUser" id="StatusSwap-@user.Id">
+								<input type="hidden" name="userId" value="@user.Id" />
+
+								<button type="submit" class="btn btn-outline-dark rounded-5" data-bs-title="Заблокировать/открыть" data-bs-toggle="tooltip">@user.Status.GetDisplayName()</button>
+							</form>
+						</td>
+						<td><a asp-area="Admin" asp-controller="Home" asp-action="UserCoursesList" asp-route-userId="@user.Id" class="btn btn-secondary">Курсы</a></td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		@* <div class="listPagination w-100 mt-auto d-flex flex-column align-items-center justify-content-center">
+			<p>
+				Страница @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) из @Model.PageCount
+			</p>
+
+			@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, searchString = ViewData["CurrentFilter"] }), new PagedListRenderOptions() { LiElementClasses = new string[] { "page-item" }, PageClasses = new string[] { "page-link" } })
+		</div> *@
+
+
+	</div>
+</main>
+
+@section Scripts {
+	<script type="text/javascript">
+		const toolripTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...toolripTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	</script>
+	<script src="~/lib/DataTables/datatables.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#UserTable').DataTable({
+				// paging: false,
+				language: {
+					"processing": "Обрабатывается...",
+					"loading": "Загрузка...",
+					"lengthMenu": "Показать _MENU_ записей",
+					"zeroRecords": "Записей не найдено",
+					"info": "Отображаются записи с _START_ до _END_ из _TOTAL_ записей",
+					"infoEmpty": "Отображаются 0 записей из 0",
+					"infoFiltered": "(отфильтровано из _MAX_ записей)",
+					"search": "Поиск:",
+					"emptyTable": "В таблице нет данных",
+					"paginate": {
+						"first": "Первая",
+						"previous": "Пред.",
+						"next": "След.",
+						"last": "Последняя"
+					},
+					"aria": {
+						"sortAscending": ": активировать сортировку по возрастанию",
+						"sortDescending": ": активировать сортировку по убыванию"
+					}
+				}
+			});
+		});
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			$(".userForms form").submit(function (event) {
+				event.preventDefault();
+
+				let formId = $(this).attr('id');
+				let userId = $("#" + formId + " input[name='userId']").val();
+				let currentSubStatus = $("#" + formId + " button[type='submit']").text();
+
+				$("#" + formId + " button[type='submit']").text("Обрабатывается...");
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("SwapStatusUser", "Home")",
+					data: { userId: userId },
+					success: function (data) {
+						$("#" + formId + " button[type='submit']").text(data.newStatus);
+					},
+					error: function (error) {
+						console.error("Error:", error);
+					}
+				});
+			});
+		});
+	</script>
+}

@@ -1,0 +1,116 @@
+﻿@model UserListViewModel
+@{
+	ViewData["Title"] = "Список пользователей";
+}
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("SidebarCreate", new { id = Model.courseId })
+
+<link href="~/lib/DataTables/datatables.min.css" rel="stylesheet">
+
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="col-md-10 mx-auto mb-5">
+		<!-- Форма создания -->
+		<h3>Список пользователей</h3>
+
+		<table id="UserTable" class="display">
+			<thead>
+				<tr>
+					<th>Фото</th>
+					<th>Имя</th>
+					<th>Дата подписки</th>
+					<th>Сменить статус</th>
+					<th>Посмотреть успеваемость</th>
+				</tr>
+			</thead>
+			<tbody>
+				@{
+					var subStatus = Enum.GetValues(typeof(SubStatus)).Cast<SubStatus>();
+				}
+				@foreach (var user in Model.userAndSubs)
+				{
+					<tr>
+						<td><img src="~/image/avatars/@user.user.AvatarPath" id="userImage" alt="Avatar" id="userImage" style="width: 20px; height: 20px;" /></td>
+						<td>@user.user.UserName</td>
+						<td>
+							@user.subscription.DateCreate.ToString("dd MMMM yyyy")
+						</td>
+						<td class="text-center">
+							<form asp-area="" asp-controller="Create" asp-action="UserSubStatusSwap" id="UserStatusSwap-@user.user.Id">
+								<input type="hidden" name="userId" value="@user.subscription.Id" />
+
+								<button type="submit" class="btn btn-outline-dark rounded-5" data-bs-title="Заблокировать/открыть" data-bs-toggle="tooltip">@user.subscription.subStatus.GetDisplayName()</button>
+							</form>
+						</td>
+						<td>
+							<a asp-area="" asp-controller="Create" asp-action="CompleteCourseList" asp-route-courseId="@Model.courseId" asp-route-userId="@user.user.Id" class="btn btn-secondary">Успеваемость</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+
+	</div>
+</main>
+
+@section Scripts {
+	<script src="~/lib/DataTables/datatables.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#UserTable').DataTable({
+				language: {
+					"processing": "Обрабатывается...",
+					"loading": "Загрузка...",
+					"lengthMenu": "Показать _MENU_ записей",
+					"zeroRecords": "Записей не найдено",
+					"info": "Отображаются записи с _START_ до _END_ из _TOTAL_ записей",
+					"infoEmpty": "Отображаются 0 записей из 0",
+					"infoFiltered": "(отфильтровано из _MAX_ записей)",
+					"search": "Поиск:",
+					"emptyTable": "В таблице нет данных",
+					"paginate": {
+						"first": "Первая",
+						"previous": "Пред.",
+						"next": "След.",
+						"last": "Последняя"
+					},
+					"aria": {
+						"sortAscending": ": активировать сортировку по возрастанию",
+						"sortDescending": ": активировать сортировку по убыванию"
+					}
+				}
+			});
+		});
+	</script>
+	<script type="text/javascript">
+		const toolripTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...toolripTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	</script>
+	<script>
+		$(document).ready(function () {
+			$("form").submit(function (event) {
+				event.preventDefault();
+
+				let formId = $(this).attr('id');
+				let userId = $("#" + formId + " input[name='userId']").val();
+				let currentSubStatus = $("#" + formId + " button[type='submit']").text();
+
+				$("#" + formId + " button[type='submit']").text("Обрабатывается...");
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("UserSubStatusSwap", "Create")",
+					data: { userId: userId },
+					success: function (data) {
+						$("#" + formId + " button[type='submit']").text(data.newSubStatus);
+					},
+					error: function (error) {
+						console.error("Error:", error);
+					}
+				});
+			});
+		});
+	</script>
+}

@@ -1,0 +1,119 @@
+﻿@model ContentViewModel
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("SidebarCreate", new { id = Model.courseId })
+
+@{
+	ViewData["Title"] = "Создание урока";
+}
+
+<script src="~/lib/ckeditor/ckeditor.js"></script>
+
+<style>
+	.ck .ck-content {
+		min-height: 200px;
+	}
+</style>
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-10 mx-auto">
+				<!-- Форма создания -->
+				<div>
+					<h3>Создание урока</h3>
+					<h5>@Model.lessonContent.ContentType.GetDisplayName(): @Model.lesson.Title</h5>
+				</div>
+
+				<form asp-area="" asp-controller="Create" asp-action="ContentCreate" method="post" class="mb-4">
+					<div asp-validation-summary="All"></div>
+					<!-- LESSONS -->
+					<div class="lessons">
+
+						@if (Model.lessonContent.ContentType == ContentType.Lecture)
+						{
+							<!-- Добавление лекции -->
+							<div>
+								<div class="mb-3">
+									<label for="content" class="form-label">Контент для лекции</label>
+									<textarea asp-for="lessonContent.Content" class="form-control" id="editor" rows="10"></textarea>
+									<span asp-validation-for="lessonContent.Content" class="form-text">Введите контент для лекции.</span>
+								</div>
+							</div>
+							@section Scripts {
+							<script>
+								ClassicEditor
+									.create(document.querySelector('#editor'), {
+										// toolbar: [ 'heading', '|', 'bold', 'italic', 'link' ]
+										ckfinder: {
+											uploadUrl: '/api/upload/Post'
+										}
+									})
+									.then(editor => {
+										window.editor = editor;
+									})
+									.catch(err => {
+										console.error(err.stack);
+									});
+							</script>
+							}
+						}
+						@if (Model.lessonContent.ContentType == ContentType.Video)
+						{
+							<!-- Добавление видео -->
+							<div>
+								<div class="mb-3">
+									<label for="video" class="form-label">Cсылка на видео</label>
+									<input asp-for="lessonContent.VideoUrl" type="text" class="form-control" id="videoInput"
+										   placeholder="Введите ссылку на видео">
+									<span asp-validation-for="lessonContent.VideoUrl" class="form-text">Используйте ссылку на видео из вставки iframe.</span>
+								</div>
+
+								<iframe id="video" width="560" height="315" src="@Model.lessonContent.VideoUrl" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+							</div>
+							@section Scripts {
+							<script>
+								const videoInput = document.getElementById('videoInput');
+								const video = document.getElementById('video');
+
+								videoInput.addEventListener('input', function () {
+									const videoUrl = this.value;
+									video.src = videoUrl;
+
+								});
+
+							</script>
+							}
+						}
+						@* @if (Model.ContentType == ContentType.Test)
+						{
+						<!-- Добавление теста -->
+						<div>
+						<div class="mb-3 col-md-6">
+						<label for="question" class="form-label">Вопрос</label>
+						<input type="text" class="form-control" id="question" placeholder="Введите вопрос">
+						</div>
+						<div class="mb-3 col-4 vstack gap-2">
+						<input type="text" class="form-control" id="answer" placeholder="Ответ">
+						<input type="text" class="form-control" id="answer" placeholder="Ответ">
+						<input type="text" class="form-control" id="answer" placeholder="Ответ">
+						<input type="text" class="form-control" id="answer" placeholder="Ответ">
+						</div>
+						</div>
+						} *@
+					</div>
+					@Html.HiddenFor(m => m.lessonContent.Id)
+					@Html.HiddenFor(m => m.lessonContent.ContentType)
+					@Html.HiddenFor(m => m.lessonContent.LessonId)
+					@Html.HiddenFor(m => m.courseId)
+
+					<input class="btn btn-primary" type="submit" value="Сохранить">
+					<button class="btn btn-danger" onclick="history.back()">Отмена</button>
+				</form>
+
+				<!-- Конец формы -->
+			</div>
+		</div>
+	</div>
+</main>
+

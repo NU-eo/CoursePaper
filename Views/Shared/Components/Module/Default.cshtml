@@ -1,0 +1,94 @@
+﻿@model CreateModuleViewModel
+@{
+	var index = (int)ViewData["Index"];
+	// Используйте индекс в вашем коде
+}
+<!-- MODULE -->
+<div class="element mb-2">
+	
+	<div class="bg-white border rounded-2">
+		<div class="d-flex justify-content-between px-3 py-2">
+			<div>
+				<form asp-controller="Create" asp-action="UpdateModule" method="post">
+					<div class="editable-group d-flex align-items-center justify-content-between d-none">
+
+						@Html.HiddenFor(m => m.module.Id)
+
+						<input type="text" class="form-control" asp-for="module.Title" id="Name-@Model.module.Id" />
+
+						<div class="btn-group ms-2" role="group">
+							<button type="submit" class="btn btn-outline-success save"
+									data-bs-title="Сохранить" data-bs-toggle="tooltip">
+								<i class="fa-solid fa-check"></i>
+							</button>
+
+							<button type="button" class="btn btn-outline-danger cancel"
+									data-bs-title="Отмена" data-bs-toggle="tooltip">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+					</div>
+				</form>
+
+				<h4 class="my-2 title">@index.ToString(). @Model.module.Title</h4>
+			</div>
+
+
+			<div class="d-flex align-items-center">
+				<button class="btn text-secondary edit" data-bs-title="Редактировать" data-bs-toggle="tooltip">
+					<i class="fa-solid fa-pencil"></i>
+				</button>
+
+				<form asp-controller="Create" asp-action="DeleteModule" method="post">
+					<input asp-for="module.Id" value="@Model.module.Id" type="hidden" />
+					<button type="submit" class="btn text-danger" data-bs-title="Удалить" data-bs-toggle="tooltip">
+						<i class="fa-solid fa-trash-can"></i>
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="lessons">
+
+		@if (Model.lessons != null)
+		{
+			int i = 1;
+			@foreach (Lesson lesson in Model.lessons)
+			{
+				@await Component.InvokeAsync("Lesson", new { lesson = lesson, MIndex = index, LIndex = i++ })
+			}
+		}
+
+	</div>
+	<form asp-area="" asp-controller="Create" asp-action="CreateLesson" method="post">
+		<div class="bg-white hstack align-items-end border border-top-0 rounded-3 rounded-top-0 mx-5 py-2 px-3 gap-4">
+			<div class="row w-100">
+				<div class="col-8">
+					<input asp-for="module.CourseId" value="@Model.module.CourseId" type="hidden" />
+					<input asp-for="lesson.ModuleId" value="@Model.module.Id" type="hidden" />
+					<label>Название урока</label>
+					<input asp-for="lesson.Title" name="lesson.Title" class="form-control" placeholder="Введите название нового урока" required>
+					<span asp-validation-for="lesson.Title"></span>
+				</div>
+				@{
+					var contentTypes = Enum.GetValues(typeof(ContentType)).Cast<ContentType>();
+				}
+				<div class="col-4">
+					<label>Тип урока</label>
+					<select class="form-select" asp-for="lesson.ContentType" name="lesson.ContentType">
+						@foreach (var contentType in contentTypes)
+						{
+							<option value="@((int)contentType)">@contentType.GetDisplayName()</option>
+						}
+					</select>
+					<span asp-validation-for="lesson.ContentType"></span>
+				</div>
+			</div>
+			<div>
+				<button type="submit" class="btn btn-primary">Создать</button>
+			</div>
+		</div>
+	</form>
+
+</div>

@@ -1,0 +1,45 @@
+﻿@model ContentViewModel
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("Sidebar", new { id = Model.courseId })
+
+@{
+	ViewData["Title"] = "Урок";
+}
+
+<link href="~/css/ck-content.css" rel="stylesheet" />
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-10 mx-auto">
+				<!-- Форма создания -->
+				<div>
+					<h3>@Model.lessonContent.ContentType.GetDisplayName(): @Model.lesson?.Title</h3>
+				</div>
+
+				<!-- LESSONS -->
+				<div class="lessons ck ck-content">
+
+					@if (Model.lessonContent.ContentType == ContentType.Lecture)
+					{
+						@Html.Raw(Model.lessonContent.Content)
+					}
+					@if (Model.lessonContent.ContentType == ContentType.Video)
+					{
+						<iframe id="video" src="@Model.lessonContent.VideoUrl" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+					}
+
+
+					@* @if (Model.ContentType == ContentType.Test)
+					{
+					} *@
+				</div>
+
+
+				<!-- Конец формы -->
+			</div>
+		</div>
+	</div>
+</main>
+

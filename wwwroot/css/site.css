@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+body,
+button {
+    font-family: "Inter", sans-serif;
+}
+
+:root {
+    --offcanvas-width: 220px;
+    --topNavbarHeight: 56px;
+}
+
+.sidebar-nav {
+    position: fixed !important;
+    width: var(--offcanvas-width) !important;
+    top: 0px;
+    height: 100%;
+    overflow-y: auto;
+    /* Скрываем скроллбар для IE, Edge и Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+    scrollbar-width: none;
+}
+    /* Скрываем скроллбар для WebKit-браузеров и браузеров на основе Blink (Chrome, Opera) */
+    .sidebar-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+}
+
+.offcanvas-backdrop {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.sidebar-link .right-icon {
+    display: inline-flex;
+}
+
+.sidebar-link[aria-expanded="true"] .right-icon {
+    transform: rotate(180deg);
+}
+
+.shadow-on-hover:hover {
+    transition: box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 576px) {
+    body {
+        overflow: auto !important;
+    }
+
+    .offbtn {
+        display: none;
+    }
+
+    .main {
+        margin-left: var(--offcanvas-width);
+    }
+    /* this is to remove the backdrop */
+
+
+    .sidebar-nav {
+        -webkit-transform: none;
+        visibility: visible !important;
+        height: 100vh;
+        top: var(--topNavbarHeight);
+    }
+}

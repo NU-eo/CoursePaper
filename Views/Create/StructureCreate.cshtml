@@ -1,0 +1,53 @@
+﻿@model CreateCourseViewModel
+@{
+	ViewData["Title"] = "Создание структуры";
+}
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("SidebarCreate", new { id = Model.course.Id })
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="col-md-10 mx-auto mb-5">
+		<!-- Форма создания -->
+		<h3>Программа курса: <span class="fw-bolder">@Model.course.Title</span> </h3>
+
+		<h6 class="my-2 text-danger fw-bold">@ViewBag.Message</h6>
+
+		@if (Model.structure.Count() != 0)
+		{
+			int i = 1;
+			@foreach (CreateModuleViewModel module in Model.structure)
+			{
+				@await Component.InvokeAsync("Module", new { module = module, index = i++ })
+			}
+		}
+
+		@section Scripts
+  {
+			<script type="text/javascript">
+				const toolripTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+				const tooltipList = [...toolripTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+			</script>
+
+			<script src="~/js/components/Module/Default.js"></script>
+		}
+
+		<form asp-area="" asp-controller="Create" asp-action="CreateModule" method="post">
+			<div class="bg-white hstack align-items-end border rounded-2 p-3 gap-4">
+				<div class="row w-100">
+					<div class="col">
+						<label class="fw-bold">Создать новый модуль</label>
+						<input asp-for="module.Title" name="module.Title" class="form-control" placeholder="Название нового модуля" required>
+						<span asp-validation-for="module.Title"></span>
+						<input asp-for="module.CourseId" value="@Model.course.Id" type="hidden" />
+					</div>
+				</div>
+				<div class="me-2">
+					<input class="btn btn-primary" type="submit" value="Создать">
+				</div>
+			</div>
+		</form>
+		<!-- Конец формы -->
+
+	</div>
+</main>

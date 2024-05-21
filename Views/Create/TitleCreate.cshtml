@@ -1,0 +1,84 @@
+﻿@model CourseTitleCreateViewModel
+@{
+	ViewData["Title"] = "Создание главной страницы курса";
+}
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("SidebarCreate", new { id = Model.course.Id })
+
+<script src="~/lib/ckeditor/ckeditor.js"></script>
+
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-8 col-10 mx-auto">
+				<h3>Создание главной страницы курса</h3>
+				<!-- Форма создания -->
+
+				<form method="post" asp-area="" asp-controller="Create" asp-action="TitleCreate" enctype="multipart/form-data">
+					<div asp-validation-summary="All"></div>
+					@Html.HiddenFor(m => m.course.Id)
+					<div class="row mb-4">
+						<div class="col-3">
+							<label asp-for="course.ImgLogoPath"></label> <br />
+							<label for="formLogo" class="form-label"><img src="~/image/curselogo/@Model.course.ImgLogoPath" id="Logo" height="80" alt=""></label>
+
+							<input asp-for="CourseLogo" class="form-control d-none" type="file" accept="image/png, image/jpeg" id="formLogo">
+							<input asp-for="course.ImgLogoPath" type="hidden" />
+
+						</div>
+
+						<div class="col-9">
+							<label asp-for="course.ImgTitlePath"></label> <br />
+							<label for="formTitle" class="form-label"><img src="~/image/courseTitleImg/@Model.course.ImgTitlePath" id="Title" width="300" alt=""></label>
+
+							<input asp-for="CourseTitleImg" class="form-control d-none" type="file" accept="image/png, image/jpeg" id="formTitle">
+							<input asp-for="course.ImgTitlePath" type="hidden" />
+						</div>
+					</div>
+
+					<div class="form-group mb-4">
+						<label asp-for="course.Title"></label>
+						<input asp-for="course.Title" class="form-control" placeholder="Введите заголовок">
+						<span asp-validation-for="course.Title"></span>
+					</div>
+
+					<div class="form-group mb-4">
+						<label asp-for="course.ShortDescription"></label>
+						<textarea asp-for="course.ShortDescription" class="form-control" placeholder="Введите краткое описание" rows="2"></textarea>
+						<span asp-validation-for="course.ShortDescription"></span>
+					</div>
+
+					<div class="form-group mb-4">
+						<label asp-for="course.AboutCourse"></label>
+						<textarea asp-for="course.AboutCourse" class="form-control" placeholder="Расскажите о содержании курса" rows="10"></textarea>
+						<span asp-validation-for="course.AboutCourse"></span>
+					</div>
+
+					<div class="form-group mb-4">
+						<label asp-for="course.ForWhom"></label>
+						<input asp-for="course.ForWhom" class="form-control" placeholder="Может для особенных людей?">
+						<span asp-validation-for="course.ForWhom"></span>
+					</div>
+
+
+					<button type="submit" class="btn btn-primary">Сохранить</button>
+					<a asp-area="" asp-controller="Create" asp-action="Index" class="btn btn-danger">Отмена</a>
+				</form>
+
+				<!-- Конец формы -->
+			</div>
+		</div>
+	</div>
+</main>
+<script>
+	document.getElementById('formLogo').onchange = function () {
+		var src = URL.createObjectURL(this.files[0])
+		document.getElementById('Logo').src = src
+	}
+	document.getElementById('formTitle').onchange = function () {
+		var src = URL.createObjectURL(this.files[0])
+		document.getElementById('Title').src = src
+	}
+</script>

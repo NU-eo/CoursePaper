@@ -1,0 +1,62 @@
+﻿@model CourseViewModel
+<!-- боковая панель -->
+<div class="offcanvas sidebar-nav text-white-50 bg-dark" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExample">
+	<div class="offcanvas-body p-0">
+		<nav class="navbar-dark">
+			<ul class="navbar-nav">
+
+				<hr class="border-white" />
+				@if (Model != null && Model.course != null && Model.course.Id != Guid.Empty)
+				{
+					<li>
+						<div class="small fw-bold text-uppercase px-3">
+							Содержание
+						</div>
+						<a class="nav-link ps-5" asp-area="" asp-controller="Learning" asp-action="TitleCourse" asp-route-id="@Model.course.Id">
+							<i class="fa-solid fa-house"></i> Главная
+						</a>
+					</li>
+					<hr class="border-white m-0" />
+				}
+
+				@if (Model != null && Model.structure != null)
+				{
+					byte i = 1;
+					@foreach (ModuleViewModel module in Model.structure)
+					{
+						byte j = 1;
+						<li>
+							<div class="small fw-bold px-3 my-2">
+								@(i). @module.module.Title
+							</div>
+							@foreach (LessonViewModel lesson in module.lessons)
+							{
+								<div class="w-100 position-relative">
+									@if (lesson.isComplete)
+									{
+										<div class="position-absolute bg-success h-100" style="min-width: 5px;"></div>
+									}
+									else
+									{
+										<div style="min-width: 10px;"></div>
+									}
+
+									<a asp-area="" asp-controller="Learning" asp-action="Lesson" asp-route-lessonId="@lesson.lesson.Id" class="nav-link ps-5">
+
+										@(i).@(j++). @lesson.lesson.Title
+									</a>
+								</div>
+							}
+							@{
+								i += 1;
+							}
+						</li>
+						<hr class="border-white m-0" />
+					}
+
+				}
+
+			</ul>
+		</nav>
+	</div>
+</div>

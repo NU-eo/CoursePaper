@@ -1,0 +1,36 @@
+﻿@await Html.PartialAsync("HeaderPartial")
+@{
+	ViewData["Title"] = "Ваши подписки";
+}
+<!-- основной контент -->
+<main class="container">
+	<h1 class="title fs-1 text-center">Подписки</h1>
+
+	<section class="container row">
+		@* Вывод подписок *@
+		@if (Model.Count != 0)
+		{
+			@foreach (Course item in Model)
+			{
+
+				<div class="my-2 col-xl-4 col-lg-6 col-12">
+					<div class="p-3 shadow border rounded-3 d-flex align-items-center gap-4">
+						<img src="~/image/curselogo/@item.ImgLogoPath" width="100" alt="картинка">
+						<div class="card-body">
+							<h5 class="card-title">@item.Title</h5>
+							<p class="card-text">@item.ShortDescription</p>
+							<a asp-area="" asp-controller="Learning" asp-action="Course" asp-route-id="@item.Id" class="btn btn-outline-success">Продолжить обучение</a>
+						</div>
+					</div>
+				</div>
+
+			}
+		} else
+		{
+			<p class="text-muted">У вас пока нет подписок</p>
+		}
+
+
+
+	</section>
+</main>

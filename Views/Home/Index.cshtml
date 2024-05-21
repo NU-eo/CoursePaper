@@ -1,0 +1,87 @@
+﻿<!-- шапачка -->
+@await Html.PartialAsync("HeaderPartial")
+
+@{
+	ViewData["Title"] = "Каталог";
+}
+
+<!-- Контент -->
+<main class="container col-lg-9 col-12">
+	<div class="navbar-form navbar-right">
+		<div class="hstack gap-3">
+			<input type="text" name="searchString" class="form-control" id="myInput" placeholder="Название || описание || предпочтения" aria-label="Поиск" value="@ViewBag.SearchString">
+			<button type="button" class="btn btn-primary" id="search-button">Поиск</button>
+		</div>
+	</div>
+
+	<section class="container vstack" style="min-height: 85vh;">
+		@* Вывод карточек *@
+		@if (Model.Count != 0)
+		{
+			@if (!String.IsNullOrEmpty(ViewBag.SearchString))
+			{
+				<h6 class="my-2">Результат по запросу "@ViewBag.SearchString"</h6>
+			}
+			@foreach (Course item in Model)
+			{
+
+				<div class="mt-2 w-100 position-relative rounded-3 bg-white">
+					<a asp-area="" asp-controller="Learning" asp-action="TitleCourse" asp-route-id="@item.Id" class="position-absolute top-0 w-100 h-100 rounded-3 shadow-on-hover"></a>
+					<div class="d-flex flex-column flex-sm-row align-items-center gap-4 p-3">
+						<img src="~/image/curselogo/@item.ImgLogoPath" width="100" style="max-height: 100px" alt="картинка">
+						<div class="card-body">
+							<h5 class="card-title">@item.Title</h5>
+							<p class="card-text mb-1">@item.ShortDescription</p>
+							<span class="">Создан @item.DateCreate.ToString("dd MMMM yyyy")</span>
+						</div>
+
+					</div>
+				</div>
+
+				<hr class="mx-5 my-2">
+
+			}
+
+			<div class="w-100 mt-auto d-flex flex-column align-items-center justify-content-center">
+				<p>
+					Страница @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) из @Model.PageCount
+				</p>
+
+				@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new { page, searchString = ViewData["CurrentFilter"] }), new PagedListRenderOptions() { LiElementClasses = new string[] { "page-item" }, PageClasses = new string[] { "page-link" } })
+			</div>
+		}
+	</section>
+
+</main>
+
+
+@section Scripts
+{
+	<script defer>
+		$(document).ready(function () {
+			$("#myInput").keypress(function (event) {
+				if (event.which == 13) {
+					SearchFunction();
+					event.preventDefault();
+				}
+			});
+
+			$('#search-button').click(function () {
+				SearchFunction();
+			});
+
+			function SearchFunction() {
+				var searchString = $('input[name="searchString"]').val();
+				$.ajax({
+					url: '/Home/Index?SearchString=' + searchString,
+					type: 'GET',
+					dataType: 'html',
+					success: function (data) {
+						$('body').html(data);
+					}
+				});
+			}
+		});
+	</script>
+
+}

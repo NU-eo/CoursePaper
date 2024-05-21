@@ -1,0 +1,123 @@
+﻿@model UserCoursesViewModel;
+
+<!-- шапачка -->
+@await Html.PartialAsync("HeaderPartial")
+
+@{
+	ViewData["Title"] = "Пользователи";
+}
+
+<link href="~/lib/DataTables/datatables.min.css" rel="stylesheet">
+
+
+<!-- Основной блок -->
+<main>
+	<div class="col-md-10 mx-auto mb-5">
+		<!-- Форма создания -->
+
+		<div class="w-100 hstack gap-3">
+			<h3>Курсы пользователя: <span>@Model.user.UserName</span></h3>
+			<button onclick="window.history.back()" class="btn btn-outline-danger">Назад</button>
+		</div>
+
+		<table id="UserTable" class="display">
+			<thead>
+				<tr>
+					<td>Логотип</td>
+					<th>Заголовок</th>
+					<th>Краткое описание</th>
+					<th>Дата создания</th>
+					<th>Статус</th>
+					<th>Действие</th>
+				</tr>
+			</thead>
+			<tbody>
+				@{
+					var Status = Enum.GetValues(typeof(StatusCourse)).Cast<StatusCourse>();
+				}
+				@foreach (var course in Model.courses)
+				{
+					<tr>
+						<td><img src="~/image/curselogo/@course.ImgLogoPath" alt="Logo" id="courseImage" style="height: 20px;" /></td>
+						<td>@course.Title</td>
+						<td>@course.ShortDescription</td>
+						<td>@course.DateCreate.ToString("dd MMMM yyyy")</td>
+						<td>
+							<form asp-area="Admin" asp-controller="Home" asp-action="SwapStatusCourse" id="StatusSwap-@course.Id">
+								<input type="hidden" name="courseId" value="@course.Id" />
+
+								<button type="submit" class="btn btn-outline-dark rounded-5" data-bs-title="Заблокировать/открыть" data-bs-toggle="tooltip">@course.Status.GetDisplayName()</button>
+							</form>
+						</td>
+						<td>
+							<a asp-area="" asp-controller="Create" asp-action="TitleView" asp-route-id="@course.Id" class="btn btn-primary">Редактировать</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+
+	</div>
+</main>
+
+@section Scripts {
+	<script type="text/javascript">
+		const toolripTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...toolripTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	</script>
+	<script src="~/lib/DataTables/datatables.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#UserTable').DataTable({
+				language: {
+					"processing": "Обрабатывается...",
+					"loading": "Загрузка...",
+					"lengthMenu": "Показать _MENU_ записей",
+					"zeroRecords": "Записей не найдено",
+					"info": "Отображаются записи с _START_ до _END_ из _TOTAL_ записей",
+					"infoEmpty": "Отображаются 0 записей из 0",
+					"infoFiltered": "(отфильтровано из _MAX_ записей)",
+					"search": "Поиск:",
+					"emptyTable": "В таблице нет данных",
+					"paginate": {
+						"first": "Первая",
+						"previous": "Пред.",
+						"next": "След.",
+						"last": "Последняя"
+					},
+					"aria": {
+						"sortAscending": ": активировать сортировку по возрастанию",
+						"sortDescending": ": активировать сортировку по убыванию"
+					}
+				}
+			});
+		});
+	</script>
+
+	<script>
+		$(document).ready(function () {
+			$("form").submit(function (event) {
+				event.preventDefault();
+
+				let formId = $(this).attr('id');
+				let courseId = $("#" + formId + " input[name='courseId']").val();
+				let currentSubStatus = $("#" + formId + " button[type='submit']").text();
+
+				$("#" + formId + " button[type='submit']").text("Обрабатывается...");
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("SwapStatusCourse", "Home")",
+					data: { courseId: courseId },
+					success: function (data) {
+						$("#" + formId + " button[type='submit']").text(data.newStatus);
+					},
+					error: function (error) {
+						console.error("Error:", error);
+					}
+				});
+			});
+		});
+	</script>
+}

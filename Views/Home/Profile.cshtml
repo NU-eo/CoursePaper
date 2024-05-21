@@ -1,0 +1,89 @@
+﻿<!-- шапачка -->
+@await Html.PartialAsync("HeaderPartial")
+
+@{
+	ViewData["Title"] = "Профиль";
+}
+<main class="container-fluid">
+	<div class="row">
+		<div class="col-md-12 text-center">
+			<h4>Профиль</h4>
+		</div>
+	</div>
+
+	<div class="row d-flex justify-content-center align-items-center h-100">
+		<div class="col col-lg-8 col-md-10 mb-4 mb-lg-0">
+			<div class="card mb-3 shadow" style="border-radius: .5rem;">
+				<div class="row g-0">
+					<div class="col-md-4 text-center">
+						<label for="fileInput">
+							<img src="~/image/avatars/@Model.AvatarPath" id="userImage" alt="Avatar" class="rounded mx-auto d-block mt-5" id="userImage" style="width: 120px; height: 120px;" />
+							<span style="font-size:0.6rem;">Нажмите для выбора фото</span>
+						</label>
+						<input id="fileInput" type="file" class="d-none" accept="image/png, image/jpeg" />
+						<br />
+
+						<button id="saveButton" class="btn btn-outline-success d-none"><i class="fa-solid fa-upload"></i></button>
+						<h5>@Model.UserName</h5>
+					</div>
+
+					<div class="col-md-8">
+						<div class="card-body p-4">
+							<h6>Информация</h6>
+							<hr class="mt-0 mb-2">
+							<div class="row pt-1">
+								<div class="col-6 mb-3">
+									<h6>Логин</h6>
+									<p class="text-muted">@Model.Login</p>
+								</div>
+								<div class="col-6 mb-3">
+									<h6>Почта</h6>
+									<p class="text-muted">@Model.Email</p>
+								</div>
+							</div>
+							<h6>Функции</h6>
+							<hr class="mt-0 mb-4">
+							<div class="row pt-1">
+								<a asp-area="" asp-controller="Account" asp-action="ChangePassword">Сменить пароль</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</main>
+
+<script>
+	document.getElementById('fileInput').onchange = function () {
+		let src = URL.createObjectURL(this.files[0])
+		document.getElementById('userImage').src = src
+		document.getElementById('saveButton').classList.remove('d-none')
+	}
+</script>
+
+<script>
+	document.getElementById('saveButton').addEventListener('click', function () {
+		let file = document.getElementById('fileInput').files[0];
+		if (file) {
+			let formData = new FormData();
+			formData.append('file', file);
+
+			let xhr = new XMLHttpRequest();
+			xhr.open('POST', '/Upload/UploadAvatar', true);
+			xhr.onload = function () {
+				if (xhr.status === 200) {
+					let response = JSON.parse(xhr.responseText);
+					let newImageSrc = '/image/avatars/' + response.fileName; // Путь к новому изображению на сервере
+
+					// Обновление атрибута src элемента img
+					document.getElementById('userImage').src = newImageSrc;
+				}
+			};
+			xhr.send(formData);
+			document.getElementById('saveButton').classList.add('d-none')
+		}
+	});
+</script>

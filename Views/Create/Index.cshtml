@@ -1,0 +1,98 @@
+﻿@await Html.PartialAsync("HeaderPartial")
+
+@{
+	ViewData["Title"] = "Созданные курсы";
+}
+
+<!-- Основной блок -->
+<main>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-10 mx-auto">
+				<!-- Начало -->
+				<h1 class="title fs-1 text-center">Мои курсы</h1>
+
+				<a class="nav-link fw-bold text-uppercase px-3 d-inline" asp-area="" asp-controller="Create" asp-action="TitleCreate">
+					<i class="fa-solid fa-plus"></i> Создание курса
+				</a>
+
+				<section class="row">
+					@* Вывод подписок *@
+					@if (Model != null)
+					{
+						@if (!String.IsNullOrEmpty(ViewBag.Message))
+						{
+							<h6 class="my-2 text-danger fw-bold">@ViewBag.Message</h6>
+						}
+						@foreach (Course item in Model)
+						{
+							<div class="my-2 p-2">
+								<div class="p-4 shadow border rounded-3 d-flex align-items-center gap-5 bg-white">
+									<img src="~/image/curselogo/@item.ImgLogoPath" width="100" style="max-height: 100px" alt="картинка">
+									<div class="card-body">
+										<div class="hstack mb-1">
+											<h5 class="card-text mb-0">@item.Title</h5>
+
+											<form asp-area="" asp-controller="Create" asp-action="CourseStatusSwap" id="StatusSwap-@item.Id" class="form-swap">
+												<input type="hidden" name="courseId" value="@item.Id" />
+
+												<button type="submit" class="badge text-bg-warning ms-lg-5 border-0" data-bs-title="Опубликовать/скрыть" data-bs-toggle="tooltip">@item.Status.GetDisplayName()</button>
+											</form>
+										</div>
+
+										<a asp-area="" asp-controller="Create" asp-action="TitleView" asp-route-id="@item.Id" class="btn btn-outline-primary">Редактировать</a>
+										<a asp-area="" asp-controller="Learning" asp-action="CourseTitle" asp-route-id="@item.Id" class="btn btn-primary">Просмотреть курс</a>
+
+									</div>
+
+									<div>
+										<form asp-area="" asp-controller="Create" asp-action="CourseDelete" method="post">
+											<input name="id" type="hidden" value="@item.Id" />
+											<button type="submit" class="btn btn-danger">Удалить курс</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						}
+					}
+
+				</section>
+				<!-- Конец -->
+			</div>
+		</div>
+	</div>
+</main>
+
+@section Scripts
+{
+	<script type="text/javascript">
+		const toolripTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...toolripTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	</script>
+	<script>
+		$(document).ready(function () {
+			$(".form-swap").submit(function (event) {
+				event.preventDefault();
+
+				let formId = $(this).attr('id');
+				let courseId = $("#" + formId + " input[name='courseId']").val();
+				let currentSubStatus = $("#" + formId + " button[type='submit']").text();
+
+				$("#" + formId + " button[type='submit']").text("Обрабатывается...");
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("CourseStatusSwap", "Create")",
+					data: { courseId: courseId },
+					success: function (data) {
+						$("#" + formId + " button[type='submit']").text(data.newStatus);
+					},
+					error: function (error) {
+						console.error("Error:", error);
+					}
+				});
+			});
+		});
+	</script>
+
+}

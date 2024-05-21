@@ -1,0 +1,74 @@
+﻿@model CompleteCourseListViewModel
+@{
+	ViewData["Title"] = "Список пользователей";
+}
+@await Html.PartialAsync("HeaderPartial")
+@await Component.InvokeAsync("SidebarCreate", new { id = Model.courseId })
+
+<link href="~/lib/DataTables/datatables.min.css" rel="stylesheet">
+
+
+<!-- Основной блок -->
+<main class="main">
+	<div class="col-md-10 mx-auto mb-5">
+		<!-- Форма создания -->
+
+		<div class="w-100 hstack gap-3">
+			<h3>Успеваемость пользователя: @Model.user.UserName</h3>
+			<button onclick="window.history.back()" class="btn btn-outline-danger">Назад</button>
+		</div>
+
+		<table id="UserTable" class="display">
+			<thead>
+				<tr>
+					<th>Модуль</th>
+					<th>Урок</th>
+					<th>Статус</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var cl in Model.completeCourseLists)
+				{
+					<tr>
+						<td>@cl.ModuleTitle</td>
+						<td>@cl.LessonTitle</td>
+						<td>@cl.LessonStatus</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+
+	</div>
+</main>
+
+@section Scripts {
+	<script src="~/lib/DataTables/datatables.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#UserTable').DataTable({
+				language: {
+					"processing": "Обрабатывается...",
+					"loading": "Загрузка...",
+					"lengthMenu": "Показать _MENU_ записей",
+					"zeroRecords": "Записей не найдено",
+					"info": "Отображаются записи с _START_ до _END_ из _TOTAL_ записей",
+					"infoEmpty": "Отображаются 0 записей из 0",
+					"infoFiltered": "(отфильтровано из _MAX_ записей)",
+					"search": "Поиск:",
+					"emptyTable": "В таблице нет данных",
+					"paginate": {
+						"first": "Первая",
+						"previous": "Пред.",
+						"next": "След.",
+						"last": "Последняя"
+					},
+					"aria": {
+						"sortAscending": ": активировать сортировку по возрастанию",
+						"sortDescending": ": активировать сортировку по убыванию"
+					}
+				}
+			});
+		});
+	</script>
+}
